@@ -5,17 +5,29 @@ class Volume() {
   private var lit:Double = 0.0
 
   //Basic math operators to add, subtract, and scale volumes
-  def + (other:Volume):Volume = {this.list + other.lit}
-  def += (other:Volume):Unit  = {this.Lit = this.lit + other.Lit }
+  def + (other:Volume):Volume = {
+    this.lit = this.lit + other.lit 
+    return Volume(this.lit)}
+  
+  def += (other:Volume):Unit  = {this.lit = this.lit + other.lit }
 
-  def - (other:Volume):Volume = {this.list - other.lit}
-  def -= (other:Volume):Unit  = {this.Lit = this.lit - other.Lit}
+  def - (other:Volume):Volume = {
+    this.lit - other.lit
+    Volume(this.lit)
+  }
+  def -= (other:Volume):Unit  = {this.lit = this.lit - other.lit}
 
-  def * (scalar:Double):Volume = {this.list * other.lit}
-  def *= (scalar:Double):Unit  = {this.Lit = this.lit * other.Lit}
+  def * (scalar:Double):Volume = {
+    this.lit * scalar
+    Volume(this.lit)
+}
+  def *= (scalar:Double):Unit  = {this.lit = this.lit * scalar}
 
-  def / (scalar:Double):Volume = {this.list / other.lit}
-  def /= (scalar:Double):Unit  = {this.list = this.list / other.lit}
+  def / (scalar:Double):Volume = {
+    this.lit / scalar
+    Volume(this.lit)
+}
+  def /= (scalar:Double):Unit  = {this.lit = this.lit / scalar}
 
  //Getter functions that return in a variety of units
   def liters():Double = { lit }
@@ -35,7 +47,7 @@ object Volume {
 
   //Alternative "static" methods to create volumes in other units
   def liters(amt:Double):Volume = { new apply() } //identical to an apply method
-  def milliliters(amt:Double):Volume = { amt * 1000 }
+  def milliliters(amt:Double):Volume = { liters * 1000 }
   def gallons(amt:Double):Volume = { lit / 3.785 }
   def quarts(amt:Double):Volume = { lit * 1.057 }
   def pints(amt:Double):Volume = { lit * 2.113 }
