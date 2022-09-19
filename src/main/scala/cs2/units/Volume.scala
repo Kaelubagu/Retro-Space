@@ -61,14 +61,16 @@ class Volume() {
     val x = this.lit
     x * 67.628
   }
+  override def toString():String = lit.toString
 }
 
 object Volume {
   //"Constructor" apply methods operating in liters
   def apply():Volume = { new Volume() }
   def apply(amt:Double):Volume = {  
-    var x = new Volume()
+    var a = new Volume()
     a.lit = amt
+    a
   }
 
   //Alternative "static" methods to create volumes in other units
@@ -90,6 +92,7 @@ object Volume {
   }
   def pints(amt:Double):Volume = { 
     val x = apply(amt * 2.113376)
+    x
   }
   def cups(amt:Double):Volume = { 
     val x = apply(amt * 4.2268)
@@ -103,5 +106,14 @@ object Volume {
     val x = apply(amt * 67.628)
     x
   }
+
+  /*def main(args:Array[String]):Unit = {
+  
 }
+*/
+}
+
+
+
+
 
