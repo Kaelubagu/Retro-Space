@@ -30,29 +30,78 @@ class Volume() {
   def /= (scalar:Double):Unit  = {this.lit = this.lit / scalar}
 
  //Getter functions that return in a variety of units
-  def liters():Double = { lit }
-  def milliliters():Double = { lit * 1000 }
-  def gallons():Double = { lit / 3.785 }
-  def quarts():Double = { lit * 1.057 }
-  def pints():Double = { lit * 2.113 }
-  def cups():Double = { lit * 4.227 }
-  def teaspoons():Double = { lit * 202.9  }
-  def tablespoons():Double = { lit * 67.628 }
+  def liters():Double = { 
+    this.lit
+  }
+  def milliliters():Double = {
+    val x = this.lit
+    x * 1000 
+  }
+  def gallons():Double = {  
+    val x = this.lit
+    x * 3.78541
+  }
+  def quarts():Double = {  
+    val x = this.lit
+    x * 1.0567
+  }
+  def pints():Double = {  
+    val x = this.lit
+    x * 2.113376
+  }
+  def cups():Double = {  
+    val x = this.lit
+    x * 4.2268
+  }
+  def teaspoons():Double = {  
+    val x = this.lit
+    x * 202.88
+  }
+  def tablespoons():Double = { 
+    val x = this.lit
+    x * 67.628
+  }
 }
 
 object Volume {
   //"Constructor" apply methods operating in liters
-  def apply():Volume = { new Volume }
-  def apply(amt:Double):Volume = { new Volume() }
+  def apply():Volume = { new Volume() }
+  def apply(amt:Double):Volume = {  
+    var x = new Volume()
+    a.lit = amt
+  }
 
   //Alternative "static" methods to create volumes in other units
-  def liters(amt:Double):Volume = { new apply() } //identical to an apply method
-  def milliliters(amt:Double):Volume = { liters * 1000 }
-  def gallons(amt:Double):Volume = { lit / 3.785 }
-  def quarts(amt:Double):Volume = { lit * 1.057 }
-  def pints(amt:Double):Volume = { lit * 2.113 }
-  def cups(amt:Double):Volume = { lit * 4.227 }
-  def teaspoons(amt:Double):Volume = { lit * 202.9 }
-  def tablespoons(amt:Double):Volume = { lit * 67.628 }
+  def liters(amt:Double):Volume = { 
+    val x = apply(amt)
+    x
+  } //identical to an apply method
+  def milliliters(amt:Double):Volume = {  
+    val x = apply(amt * 1000)
+    x
+  }
+  def gallons(amt:Double):Volume = { 
+    val x = apply(amt * 3.78541)
+    x
+  }
+  def quarts(amt:Double):Volume = { 
+    val x = apply(amt * 1.0567)
+    x
+  }
+  def pints(amt:Double):Volume = { 
+    val x = apply(amt * 2.113376)
+  }
+  def cups(amt:Double):Volume = { 
+    val x = apply(amt * 4.2268)
+    x
+  }
+  def teaspoons(amt:Double):Volume = { 
+    val x = apply(amt * 202.88)
+    x
+  }
+  def tablespoons(amt:Double):Volume = { 
+    val x = apply(amt * 67.628)
+    x
+  }
 }
 
