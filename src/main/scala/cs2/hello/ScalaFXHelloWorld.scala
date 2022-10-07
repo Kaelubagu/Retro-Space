@@ -27,7 +27,7 @@ object ScalaFXHelloWorld extends JFXApp3 {
             },
             new Text {
               text = "FX"
-              style = "-fx-font: italic bold 100pt sans-serif"
+              style = "-fx-font: italic bold 70pt serif"
               fill = new LinearGradient(
                 endX = 0,
                 stops = Stops(White, DarkGray)
