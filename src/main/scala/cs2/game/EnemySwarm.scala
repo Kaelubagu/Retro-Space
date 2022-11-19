@@ -4,6 +4,7 @@ import scalafx.scene.canvas.GraphicsContext
 import scala.util.Random
 import scalafx.scene.image.Image
 import cs2.util.Vec2
+import scala.collection.mutable.Buffer
 
 
 /** contains the control and logic to present a coordinated set of Enemy objects.
@@ -20,28 +21,66 @@ class EnemySwarm(private val nRows:Int, private val nCols:Int){
   val bulletPath = getClass().getResource("/images/bullet.png") //seriously make a sprite list
   val bulletImg  = new Image(bulletPath.toString)
 
-  var enemySwarmList = List[Enemy]()
+  var enemySwarmBuffer = Buffer[Enemy]()
+  
 
   for(a <- 1 to nRows; j <- 1 to nCols) {
-    enemySwarmList ::= new Enemy(enemyImg, new Vec2(180*a - 115,75*j), bulletImg)
+    enemySwarmBuffer += new Enemy(enemyImg, new Vec2(100*a - 25,75*j), bulletImg)
    }
    
 
 
   def display(g:GraphicsContext):Unit = {
-   enemySwarmList.foreach(_.display(g))
+   enemySwarmBuffer.foreach(_.display(g))
       
    
   }
 
-  /** overridden method of ShootsBullets. Creates a single, new bullet instance
-   *  originating from a random enemy in the swarm. (Not a bullet from every
-   *  object, just a single from a random enemy)
-   *
-   *  @return Bullet - the newly created Bullet object fired from the swarm
-   */
+
   def arrayshoot():Bullet = { 
-    enemySwarmList((math.random * enemySwarmList.length).toInt).shoot()
+    enemySwarmBuffer((math.random * enemySwarmBuffer.length).toInt).shoot()
+  }
+  
+
+
+
+
+  def EShit(s:Sprite):Boolean = {
+    val bulletPath = getClass().getResource("/images/bullet.png")
+    val bulletImg  = new Image(bulletPath.toString)
+    val playerAva = getClass().getResource("/images/Sprite.png")
+    val playerImg = new Image(playerAva.toString)
+    val playerbulletpic = bulletImg
+    
+
+    var enemyRB = Buffer[Enemy]() 
+
+    var attack = false
+      for(Enemy <- enemySwarmBuffer) {
+        if(Enemy.intersection(s)){
+          enemyRB += Enemy
+          attack = true 
+        }
+      }
+      enemySwarmBuffer --= enemyRB
+      attack
+    
   }
 
+  def enemyBump(s:Sprite):Boolean = {
+    var Bump = false
+    for(Enemy <- enemySwarmBuffer) {
+      if(Enemy.intersection(s))
+        Bump = true
+    }
+    Bump
+
+  }
+  def isEmpty():Boolean = {
+    var empty = false
+    if(enemySwarmBuffer.length == -1) {
+      empty = true
+    }
+    empty
+  }
 }

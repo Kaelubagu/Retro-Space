@@ -17,32 +17,37 @@ class Player(avatar:Image, var initPos:Vec2, private val bulletPic:Image) extend
 
 
   
+  def moveUp():Unit = { 
+    if(initPos.y > 50)
+      initPos.y -= 8
+    else
+      initPos.y += 0
+  }
 
+  def moveDown():Unit = { 
+    if(initPos.y < 750)
+      initPos.y += 8
+    else
+      initPos.y += 0
+  }
 
   def moveLeft():Unit = { 
-    if(initPos.x > 100)
-      initPos.x -= 20
+    if(initPos.x > 50)
+      initPos.x -= 8
     else
       initPos.x += 0
   }
 
-  /** moves the player sprite one "step" to the right (see note above)
-   *
-   *  @return none/Unit
-   */
+
   def moveRight():Unit = { //not taking it all the way to the end (900) because it looks unnatural if I did.
-    if(initPos.x < 750) 
-      initPos.x += 20
+    if(initPos.x < 800) 
+      initPos.x += 8
     else 
       initPos.x += 0 
     
   }
 
-  /** creates a new Bullet instance beginning from the player, with an
-   *  appropriate velocity
-   *
-   *  @return Bullet - the newly created Bullet object that was fired
-   */
+
   def shoot():Bullet = { 
 
     new Bullet(bulletPic, new Vec2(initPos.x, initPos.y - 30), Vec2(0,25))

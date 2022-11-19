@@ -12,6 +12,7 @@ import scalafx.scene.canvas.GraphicsContext
  */
 abstract class Sprite (protected val img:Image, protected var pos:Vec2) {
 
+  val picture = img
 
   def move (direction:Vec2):Unit = { 
     pos.x += direction.x
@@ -21,12 +22,33 @@ abstract class Sprite (protected val img:Image, protected var pos:Vec2) {
 
   def moveTo (location:Vec2):Unit = { 
     pos.x = location.x
-    pos.x = location.y
+    pos.y = location.y
   }
   
 
   def display (g:GraphicsContext):Unit = { 
     g.drawImage(img, pos.x, pos.y)
   }
+
+
+
+  def intersection(s:Sprite):Boolean = {
+    
+    var attack = false
+
+    val whatWidth = this.img.width.value
+    val aheight = s.img.height.value
+    val whatHeight = this.img.height.value
+    val awidth = s.img.width.value
+    val timg = this.img
+
+    if((this.pos.x + whatWidth > s.pos.x && this.pos.x < s.pos.x + awidth) && (this.pos.y + whatHeight > s.pos.y && this.pos.y < s.pos.y + aheight) && (s.img != timg))
+      attack = true
+    
+    attack
+  }
+  
   
 }
+
+
