@@ -11,17 +11,17 @@ import cs2.util.Vec2
  *  @param initPos the initial position of the '''center''' of the bullet
  *  @param vel the initial velocity of the bullet
  */
-class Bullet(pic:Image, var initPos:Vec2,  var vel:Vec2) extends Sprite(pic, initPos) {
+class Bullet(val pic:Image, var initPos:Vec2,  var vel:Vec2) extends Sprite(pic, initPos) {
 
   /** advances the position of the Bullet over a single time step
    * 
    *  @return none/Unit
    */
   def timeStep():Unit = { 
-    if(initPos.y > -100){
+
     initPos.x += vel.x 
     initPos.y -= vel.y
-    }
+
   }
   
 }

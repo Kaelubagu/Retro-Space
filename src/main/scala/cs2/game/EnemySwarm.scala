@@ -7,78 +7,66 @@ import cs2.util.Vec2
 import scala.collection.mutable.Buffer
 
 
-/** contains the control and logic to present a coordinated set of Enemy objects.
- *  For now, this class generates a "grid" of enemy objects centered near the
- *  top of the screen.
- *
- *  @param nRows - number of rows of enemy objects (4 rows of 8 enemies)
- *  @param nCols - number of columns of enemy objects
- */
+
 class EnemySwarm(private val nRows:Int, private val nCols:Int){
 
-  val enemyPath = getClass().getResource("/images/enemy.png") //make a sprite list later 
-  val enemyImg  = new Image(enemyPath.toString)
-  val bulletPath = getClass().getResource("/images/bullet.png") //seriously make a sprite list
-  val bulletImg  = new Image(bulletPath.toString)
 
+//make a sprite list later 
+
+  val enemybulletPath = getClass().getResource("/images/enemybullet.png") //seriously make a sprite list
+  val enemybulletImg  = new Image(enemybulletPath.toString)
   var enemySwarmBuffer = Buffer[Enemy]()
+
+
   
-
-  for(a <- 1 to nRows; j <- 1 to nCols) {
-    enemySwarmBuffer += new Enemy(enemyImg, new Vec2(100*a - 25,75*j), bulletImg)
+  for(a <- 1 to nRows; j <- 1 to nCols) { // enemySwarm grid of enemies
+    enemySwarmBuffer += new Enemy(Sprites.enemyImg, new Vec2(100*a ,75*j), enemybulletImg)
    }
-   
-
 
   def display(g:GraphicsContext):Unit = {
    enemySwarmBuffer.foreach(_.display(g))
-      
-   
   }
 
-
-  def arrayshoot():Bullet = { 
+  def arrayshoot():Bullet = { //shooting should be random 
     enemySwarmBuffer((math.random * enemySwarmBuffer.length).toInt).shoot()
   }
-  
 
-
-
-
-  def EShit(s:Sprite):Boolean = {
-    val bulletPath = getClass().getResource("/images/bullet.png")
-    val bulletImg  = new Image(bulletPath.toString)
-    val playerAva = getClass().getResource("/images/Sprite.png")
-    val playerImg = new Image(playerAva.toString)
-    val playerbulletpic = bulletImg
-    
-
+  def bulletHitEnemy(s:Sprite):Boolean = { //when bullet intersects enemy
+    val playerBulletPic = Sprites.playerBullet
+    val enemyBulletImg = Sprites.enemyBullet
     var enemyRB = Buffer[Enemy]() 
-
     var attack = false
-      for(Enemy <- enemySwarmBuffer) {
-        if(Enemy.intersection(s)){
+      for(Enemy <- enemySwarmBuffer){
+        if((Enemy.intersection(s)) && (s.picture == playerBulletPic)){
           enemyRB += Enemy
           attack = true 
         }
+        else if (s.picture == enemybulletImg)
+          attack = false
       }
       enemySwarmBuffer --= enemyRB
       attack
-    
   }
-
-  def enemyBump(s:Sprite):Boolean = {
+  
+  def playerBumpEnemy(s:Sprite):Boolean = {
+    val spaceCraft = Sprites.spaceCraft
     var Bump = false
     for(Enemy <- enemySwarmBuffer) {
-      if(Enemy.intersection(s))
+      if((Enemy.intersection(s)) && (s.picture == spaceCraft))
         Bump = true
     }
     Bump
-
   }
+
+  def swarmMove():Unit = {
+    enemySwarmBuffer.foreach(_.move())
+  }
+
+
+
   def isEmpty():Boolean = {
     var empty = false
-    if(enemySwarmBuffer.length == -1) {
+    if(enemySwarmBuffer.length == 0) {
       empty = true
     }
     empty

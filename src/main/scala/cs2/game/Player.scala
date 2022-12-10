@@ -40,7 +40,7 @@ class Player(avatar:Image, var initPos:Vec2, private val bulletPic:Image) extend
 
 
   def moveRight():Unit = { //not taking it all the way to the end (900) because it looks unnatural if I did.
-    if(initPos.x < 800) 
+    if(initPos.x < 700) 
       initPos.x += 8
     else 
       initPos.x += 0 

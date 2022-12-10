@@ -11,7 +11,9 @@ import scalafx.scene.canvas.GraphicsContext
  *  @param pos the initial position of the '''center''' of the sprite in 2D space
  */
 abstract class Sprite (protected val img:Image, protected var pos:Vec2) {
-
+  
+  val width = img.getWidth()
+  val height = img.getHeight()
   val picture = img
 
   def move (direction:Vec2):Unit = { 
@@ -33,22 +35,27 @@ abstract class Sprite (protected val img:Image, protected var pos:Vec2) {
 
 
   def intersection(s:Sprite):Boolean = {
-    
-    var attack = false
 
-    val whatWidth = this.img.width.value
-    val aheight = s.img.height.value
-    val whatHeight = this.img.height.value
-    val awidth = s.img.width.value
-    val timg = this.img
-
-    if((this.pos.x + whatWidth > s.pos.x && this.pos.x < s.pos.x + awidth) && (this.pos.y + whatHeight > s.pos.y && this.pos.y < s.pos.y + aheight) && (s.img != timg))
-      attack = true
+    val lowerx = pos.x
+    val higherx = pos.x + width
+    val lowery = pos.y
+    val highery = pos.y + height
     
-    attack
+    val dosLowerx = s.pos.x
+    val dosHigherx = s.pos.x + s.width
+    val dosLowery = s.pos.y
+    val dosHighery = s.pos.y + s.height
+
+    if((dosLowerx < higherx) && (dosHigherx > lowerx) && (dosLowery < highery) && (dosHighery > lowery)){
+     true
+    } 
+    else {
+     false
+    }
   }
   
   
 }
+
 
 
