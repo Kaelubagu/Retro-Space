@@ -23,5 +23,13 @@ class Bullet(val pic:Image, var initPos:Vec2,  var vel:Vec2) extends Sprite(pic,
     initPos.y -= vel.y
 
   }
+
+  override def clone():Bullet = {
+    var clonePos = new Vec2(this.pos.x, this.pos.y)
+    var BulletClone = new Bullet(pic, clonePos, vel) //vel how fast bullet traveling
+    BulletClone
+  }
   
 }
+
+

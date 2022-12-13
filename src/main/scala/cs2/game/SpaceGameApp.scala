@@ -20,17 +20,16 @@ import scalafx.scene.canvas.GraphicsContext
 import cs2.util.Vec2
 import scala.collection.mutable.Buffer
 import scala.collection.mutable.Set
+import scala.collection.mutable.Stack
 
 object SpaceGameApp extends JFXApp {
 
-  val player = new Player(Sprites.spaceCraft, new Vec2(375, 650), Sprites.playerBullet)
-  val playerBullet = new Bullet(Sprites.playerBullet, new Vec2(player.initPos.x, player.initPos.y + 100),Vec2(0, 2.5))
-  var enemySwarm = new EnemySwarm(8,4)
 
+  
+  var gs = new GameState()
+  var gsStack = new Stack[GameState]
   var keysTrackedSet = Set[KeyCode]()
   var BulletRB = Buffer[Bullet]()
-  var BulletBuffer = Buffer[Bullet]()
-  var enemySwarmBuffer = Buffer[Enemy]()
   
 
   stage = new JFXApp.PrimaryStage {
@@ -40,44 +39,40 @@ object SpaceGameApp extends JFXApp {
       content = canvas
       val a = canvas.graphicsContext2D
 
-      var Score:Int = 0
-      var Lives:Int = 3
-      var Time: Int = 60
-      var count:Int = 0
-      var livesDP = false
-      var timeDP = false
       var startScreen = true
       var showPauseScreen = false
       var showDeadScreen = false
       var beginGame = false
-      var scoreDP = false
+
 
       canvas.requestFocus()
 
       canvas.onKeyPressed = (e: KeyEvent) => {
         if (e.code == KeyCode.ENTER) {
           beginGame = true
-          scoreDP = true
-          livesDP = true
-          timeDP = true
+          gs.scoreDP = true
+          gs.livesDP = true
+          gs.timeDP = true
           showPauseScreen = false
           showDeadScreen = false
           startScreen = false
         }
 
         if (e.code == KeyCode.G) {
+          timeRO = false
           beginGame = true
-          scoreDP = true
-          livesDP = true
-          timeDP = true
-          enemySwarm = new EnemySwarm(6, 3)
+          gs.scoreDP = true
+          gs.livesDP = true
+          gs.timeDP = true
+          gs.enemySwarm = new EnemySwarm(6, 3)
           showDeadScreen = false
           startScreen = false
           showPauseScreen = false
-          Time = 60
-          Lives = 3
-          killcounter = 0
-          bulletinterception = 0
+          gs.Time = 60
+          gs.Lives = 3
+          gs.killcounter = 0
+          gs.bulletinterception = 0
+          rewindCounter = 0
         }
         
         if (e.code == KeyCode.Escape) {
@@ -85,13 +80,19 @@ object SpaceGameApp extends JFXApp {
           beginGame = false
           showDeadScreen = false
           startScreen = false
-          livesDP = false
-          scoreDP = false
-          timeDP = false
+          gs.livesDP = false
+          gs.scoreDP = false
+          gs.timeDP = false
         }
+
 
         
         //WASD functionality
+
+        if (e.code == KeyCode.R) { //reverse
+          keysTrackedSet += KeyCode.R
+        }
+        
         if (e.code == KeyCode.Left || e.code == KeyCode.A) {
           keysTrackedSet += KeyCode.Left
         }
@@ -112,6 +113,9 @@ object SpaceGameApp extends JFXApp {
       }
 
       canvas.onKeyReleased = (e: KeyEvent) => {
+        if (e.code == KeyCode.R ) {
+          keysTrackedSet -= KeyCode.R
+        }
         if (e.code == KeyCode.Left || e.code == KeyCode.A) {
           keysTrackedSet -= KeyCode.Left
         }
@@ -132,8 +136,8 @@ object SpaceGameApp extends JFXApp {
 
         var slowdown = 0
         var enemyslowdown = 0
-        var killcounter = 0
-        var bulletinterception = 0
+        var rewindCounter = 0
+        var timeRO = false
         val timer = AnimationTimer(t => {
 
         if (startScreen == true) {
@@ -144,45 +148,62 @@ object SpaceGameApp extends JFXApp {
             a.textAlign = TextAlignment.Center 
             a.setFill(Color.Black) 
             //Title
-            val spaceTitle = a.fillText("RETRO SPACE!", canvas.getWidth() / 2 , 400)
+            a.drawImage(Sprites.gameLogo, 202, 200)//logo
             val beginWords = a.fillText("Press ENTER to start", canvas.getWidth() / 2 , 750)
-        }
-        
 
+
+        }
+
+        if(!keysTrackedSet.contains(KeyCode.R)) {
+          
+        
 
         if (beginGame) {
             a.drawImage(Sprites.space, 0, 0)//background
             a.setFont(Fonts.Silkscreen)
             a.setFill(Color.Black)
-            a.fillText("Player Score: "+Score.toString(), canvas.height.value -400, 780) //score
+            a.fillText("Player Score: "+gs.Score.toString(), canvas.height.value -400, 780) //score
             a.setFont(Fonts.Silkscreen)
             a.setFill(Color.White)
-            a.fillText("Lives: " + Lives.toString(), canvas.height.value -670, 50) //lives
-            a.setFont(Fonts.Silkscreen);a.setFill(Color.White);a.fillText(Time.toString(), canvas.height.value - 50, 50) //time
-            player.display(a)
-            enemySwarm.display(a)
-            enemySwarm.swarmMove()
+            a.fillText("Lives: " + gs.Lives.toString(), canvas.height.value -670, 50) //lives
+            a.setFont(Fonts.Silkscreen);a.setFill(Color.White);a.fillText(gs.Time.toString(), canvas.height.value - 50, 50) //time
+            a.setFill(Color.White);a.fillRect(20, 80, rewindCounter / 5, 30)
+            a.setFont(Fonts.Silkscreen);a.setFill(Color.Black);a.fillText("(r) Rewind", 130, 108, 200)
+            gs.player.display(a)
+            gs.enemySwarm.display(a)
+            gs.enemySwarm.swarmMove()
+            gs.count+=1
             enemyslowdown += 1
-            count+=1
+
+            if(rewindCounter >= 0 ) {
+              if(rewindCounter <= 3598) { // small delay by 2 frames
+                rewindCounter += 1
+              }
+              if(rewindCounter == 3599) {// small delay by 1 frame
+                rewindCounter = 3599
+              }
+            }
            
             if (keysTrackedSet.contains(KeyCode.Left)) {
-            player.moveLeft()
+            gs.player.moveLeft()
             }
             if (keysTrackedSet.contains(KeyCode.Right)) {
-            player.moveRight()
+            gs.player.moveRight()
             }
             if (keysTrackedSet.contains(KeyCode.Up)) {
-            player.moveUp()
+            gs.player.moveUp()
             }
             if (keysTrackedSet.contains(KeyCode.Down)) {
-            player.moveDown()
+            gs.player.moveDown()
             }
 
             if (keysTrackedSet.contains(KeyCode.Space)) {
                 slowdown += 1
                 if (slowdown > 0) {
                     slowdown = -15
-                    BulletBuffer += player.shoot()
+                    gs.BulletBuffer += gs.player.shoot()
+
+            
             }
           } 
         }
@@ -199,14 +220,40 @@ object SpaceGameApp extends JFXApp {
 
         }
 
-         if (Lives == 0 || Time == 0) {
+        if (gs.Lives == 0) { // death
+            timeRO == false
             showPauseScreen = false
             beginGame = false
             showDeadScreen = true
-            livesDP = false
-            scoreDP = false
-            timeDP = false
+            gs.livesDP = false
+            gs.scoreDP = false
+            gs.timeDP = false
             startScreen = false
+            rewindCounter = 0
+        }
+
+        if (gs.Time == 0) { //time up screen
+            timeRO = true
+            showPauseScreen = false
+            beginGame = false
+            showDeadScreen = false
+            gs.livesDP = false
+            gs.scoreDP = false
+            gs.timeDP = false
+            startScreen = false
+            rewindCounter = 0
+
+        }
+
+        if (timeRO) {
+            a.setFill(Color.White)
+            a.fillRect(0,0, 800,800)
+            a.setFont(Fonts.Silkscreen)
+            a.setFill(Color.Black)
+            a.fillText("Time Up, Loser", 400, 400)
+            a.setFont(Fonts.Silkscreen)
+            a.fillText("Press G to Begin a New Game", canvas.width.value / 2, 450 , 500)
+
         }
 
         if (showDeadScreen) {
@@ -219,66 +266,99 @@ object SpaceGameApp extends JFXApp {
             a.fillText("Press G to Begin a New Game", canvas.width.value / 2, 450 , 500)
         }   
 
-        if(count > 0){
-            count = -60
-            Time -= 1
+        if (gs.count > 0){
+            gs.count = -60
+            gs.Time -= 1
         }
-        for (Bullet <- BulletBuffer) {
+        
+        for (Bullet <- gs.BulletBuffer) {
             Bullet.display(a)
             Bullet.timeStep()
         }
 
         if (enemyslowdown > 0) {
             enemyslowdown = -45
-            BulletBuffer += enemySwarm.arrayshoot()
+            gs.BulletBuffer += gs.enemySwarm.arrayshoot()
         }
 
 
-        for (i <- 0 until BulletBuffer.length) {
-          if (BulletBuffer(i).initPos.y > 830 || BulletBuffer(i).initPos.y < -30)
-            BulletRB += BulletBuffer(i)
+        for (i <- 0 until gs.BulletBuffer.length) {
+          if (gs.BulletBuffer(i).initPos.y > 850 || gs.BulletBuffer(i).initPos.y < -30)
+            BulletRB += gs.BulletBuffer(i)
 
           val enemybp = Sprites.enemyBullet 
-          if ( player.intersection(BulletBuffer(i)) && BulletBuffer(i).pic != Sprites.playerBullet) {
-            player.moveTo(Vec2(375, 650))
-            Lives -= 1 
-            BulletRB += BulletBuffer(i)
+          if ( gs.player.intersection(gs.BulletBuffer(i)) && gs.BulletBuffer(i).pic != Sprites.playerBullet) {
+            gs.player.moveTo(Vec2(375, 650))
+            gs.Lives -= 1 
+            BulletRB += gs.BulletBuffer(i)
           }
         }
 
-        BulletBuffer --= BulletRB
-        for (i <- 0 until BulletBuffer.length) {
-          if (enemySwarm.bulletHitEnemy(BulletBuffer(i))) {
-            BulletRB += BulletBuffer(i)
-            killcounter+=1
+        gs.BulletBuffer --= BulletRB
+        for (i <- 0 until gs.BulletBuffer.length) {
+          if (gs.enemySwarm.bulletHitEnemy(gs.BulletBuffer(i))) {
+            BulletRB += gs.BulletBuffer(i)
+            gs.killcounter += 1
            
           }
-          if (enemySwarm.playerBumpEnemy(player)) {
-            Lives -= 1
-            player.moveTo(Vec2(375, 650))
+          if (gs.enemySwarm.playerBumpEnemy(gs.player)) {
+            gs.Lives -= 1
+            gs.player.moveTo(Vec2(375, 650))
           }
 
-          for (j <- 0 until BulletBuffer.length) {
+          for (j <- 0 until gs.BulletBuffer.length) {
             if (i != j) {
-              if ((BulletBuffer(i).intersection(BulletBuffer(j)))) {
-                bulletinterception += 1 
-                BulletRB += BulletBuffer(i)
-                BulletRB += BulletBuffer(j)
+              if ((gs.BulletBuffer(i).intersection(gs.BulletBuffer(j)))) {
+                gs.bulletinterception += 1 
+                BulletRB += gs.BulletBuffer(i)
+                BulletRB += gs.BulletBuffer(j)
               }
             }
           }
 
         }
 
-        BulletBuffer --= BulletRB
+        gs.Score = gs.killcounter * 300 + gs.bulletinterception * 10 //score counter
 
-        if (enemySwarm.isEmpty()) {
+        gs.BulletBuffer --= BulletRB
 
-          enemySwarm = new EnemySwarm(6, 3)
-          enemySwarm.display(a)
+        gsStack.push(gs.deepycopy())
+
+        if (gs.enemySwarm.isEmpty()) { 
+          gs.enemySwarm = new EnemySwarm(6, 3)
+          gs.enemySwarm.display(a)
         }
 
-         Score = killcounter*100 + bulletinterception*25 
+      } else {
+          if(gs.Time < 60 && rewindCounter > 0) {
+            if(rewindCounter > 1) {
+              rewindCounter -= 1
+            }
+            if(rewindCounter == 1) {
+              rewindCounter = 0
+            }
+            gs = gsStack.pop()
+
+            a.drawImage(Sprites.space, 0, 0)//background
+            a.setFont(Fonts.Silkscreen)
+            a.setFill(Color.Black)
+            a.fillText("Player Score: "+gs.Score.toString(), canvas.height.value -400, 780) //score
+            a.setFont(Fonts.Silkscreen)
+            a.setFill(Color.White)
+            a.fillText("Lives: " + gs.Lives.toString(), canvas.height.value -670, 50) //lives
+            a.setFont(Fonts.Silkscreen);a.setFill(Color.White);a.fillText(gs.Time.toString(), canvas.height.value - 50, 50) //time
+            a.setFont(Fonts.Silkscreen);a.setFill(Color.White);a.fillText("REWIND!!!", 400, 400, 200);a.setFill(Color.Red);a.fillRect(20, 80, rewindCounter / 5, 30)
+
+            gs.player.display(a)
+            gs.enemySwarm.display(a)
+            for(bullet <- gs.BulletBuffer) {
+              bullet.display(a)
+            }
+        }
+
+      }
+
+         
 
       })
 
@@ -293,6 +373,7 @@ object SpaceGameApp extends JFXApp {
 
 //Object classes to hold things in place
 
+
 object Fonts {
     val path = getClass().getResource("/fonts/Silkscreen-Bold.ttf").toString 
     val Silkscreen = Font.loadFont(path,40)
@@ -301,6 +382,9 @@ object Fonts {
 object Sprites {
     val spaceCraftPath = getClass().getResource("/images/spacecraft.png")
     val spaceCraft = new Image(spaceCraftPath.toString())
+
+    val gameLogoPath = getClass().getResource("/images/Logo.gif")
+    val gameLogo = new Image(gameLogoPath.toString())
 
     val playerBulletPath = getClass().getResource("/images/bullet.png")
     val playerBullet = new Image(playerBulletPath.toString())
@@ -313,5 +397,4 @@ object Sprites {
 
     val BackgroundPath = getClass().getResource("/images/Background.jpg")
     val space = new Image(BackgroundPath.toString())
-  
 }

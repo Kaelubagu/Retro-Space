@@ -62,7 +62,14 @@ class EnemySwarm(private val nRows:Int, private val nCols:Int){
     enemySwarmBuffer.foreach(_.move())
   }
 
-
+  def cloneBuffer(): Buffer[Enemy] = {
+    var cloneBuffer = Buffer[Enemy]()
+      for(Enemy <- enemySwarmBuffer) {
+        var AEnemy = Enemy.clone()
+        cloneBuffer += AEnemy
+      }
+      cloneBuffer
+  }
 
   def isEmpty():Boolean = {
     var empty = false
@@ -71,4 +78,6 @@ class EnemySwarm(private val nRows:Int, private val nCols:Int){
     }
     empty
   }
+
+
 }

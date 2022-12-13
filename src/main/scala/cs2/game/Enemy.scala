@@ -26,14 +26,18 @@ class Enemy(pic:Image, var initPos:Vec2, private val bulletPic:Image) extends Sp
     initPos.x += vel
     initPos.y += vel
 
-    if (initPos.x == 750 || initPos.x == 0){
+    if (initPos.x == 600 || initPos.x == 0){
       vel = -1
     }
     else if (initPos.y == 400 || initPos.y == 0)
       vel = -1 * vel
 
-    
+    }
 
-  }
+    override def clone():Enemy = {
+      var clonedEnemyP = new Vec2(this.initPos.x, this.initPos.y)
+      var clonedEnemy = new Enemy(Sprites.enemyImg, clonedEnemyP, Sprites.enemyBullet) 
+      clonedEnemy
+    }
 
 }

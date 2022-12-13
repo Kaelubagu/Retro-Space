@@ -18,7 +18,7 @@ class Player(avatar:Image, var initPos:Vec2, private val bulletPic:Image) extend
 
   
   def moveUp():Unit = { 
-    if(initPos.y > 50)
+    if(initPos.y > 0)
       initPos.y -= 8
     else
       initPos.y += 0
@@ -32,7 +32,7 @@ class Player(avatar:Image, var initPos:Vec2, private val bulletPic:Image) extend
   }
 
   def moveLeft():Unit = { 
-    if(initPos.x > 50)
+    if(initPos.x > 0)
       initPos.x -= 8
     else
       initPos.x += 0
@@ -40,13 +40,18 @@ class Player(avatar:Image, var initPos:Vec2, private val bulletPic:Image) extend
 
 
   def moveRight():Unit = { //not taking it all the way to the end (900) because it looks unnatural if I did.
-    if(initPos.x < 700) 
+    if(initPos.x < 750) 
       initPos.x += 8
     else 
       initPos.x += 0 
     
   }
 
+  override def clone():Player = {
+    var cloneposition:Vec2 = new Vec2(this.pos.x, this.pos.y)
+    var clonedPlayer = new Player(this.avatar, cloneposition, this.bulletPic) //not changing, just copying manually
+    clonedPlayer
+  }
 
   def shoot():Bullet = { 
 
