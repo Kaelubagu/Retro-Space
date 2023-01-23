@@ -1,4 +1,4 @@
-# cs2hw-F22
+# Retro Space!
 
-This is the repository that you will be using to develop and turn in all homework assignments for the semester.
+This contains all the repositories for coding Retro Space. Created in Scala-FX, this was made during my CS2 semester in college.
 
